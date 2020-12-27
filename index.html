@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Suggests</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <h2>Try to search</h2>
+
+    <form class="test" autocomplete="off" onsubmit="return false;">
+        <div class="autocomplete">
+            <input id="input_id" class="input" type="text" name="input" placeholder="search film">
+        </div>
+        <input class="submit" id="submit_id" type="submit" onclick="submitHandler(); return false;">
+    </form>
+
+    <h2>Last searches</h2>
+    <div id="last-searches_id" class="last-searches"></div>
+
+    <script src="index.js"></script>
+</body>
+</html>
