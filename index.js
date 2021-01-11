@@ -14,12 +14,14 @@ function showLastSearches() {
     lastSearches.innerHTML = "";
 
     for(let val of values.reverse()) {
+        const divContent = val['original_title'].trim().toLowerCase();
         const div = document.createElement("div");
         div.setAttribute("class", "last-searches__item");
-        div.innerHTML = val;
-        div.innerHTML += `<input type='hidden' value='${val}'>`;
+        div.innerHTML = divContent;
+        div.innerHTML += `<input type='hidden' value='${divContent}'>`;
         div.addEventListener("click", function(e) {
             inp.value = this.getElementsByTagName("input")[0].value;
+            showFilmCard(val);
         });
 
         lastSearches.appendChild(div);
@@ -27,9 +29,15 @@ function showLastSearches() {
 }
 
 function submitHandler() {
+    const filmCard = document.getElementById("film-card_id");
+    filmCard.style.display = 'none';
+    while (filmCard.firstChild) {
+        filmCard.removeChild(filmCard.firstChild);
+    }
+
     const inp = document.getElementById('input_id');
     let lastSearches = localStorage.getItem("last_searches");
-    const val = inp.value.trim();
+    const val = inp['active'];
     inp.value = null;
 
     if (!val) return;
@@ -37,7 +45,7 @@ function submitHandler() {
     if (!lastSearches) {
         lastSearches = [];
     } else {
-        lastSearches = JSON.parse(lastSearches).filter(i => i !== val);
+        lastSearches = JSON.parse(lastSearches).filter(i => i['id'] !== val['id']);
 
         if (lastSearches.length === 5) lastSearches.shift();
     }
@@ -45,6 +53,32 @@ function submitHandler() {
     lastSearches.push(val);
     localStorage.setItem("last_searches", JSON.stringify(lastSearches));
     showLastSearches();
+}
+
+function showFilmCard(film) {
+    const filmCard = document.getElementById("film-card_id");
+
+    const title = document.createElement("h2");
+    title.innerHTML = "Film card";
+
+    const filmTitle = document.createElement("div");
+    filmTitle.setAttribute("class", "film-card__title");
+    filmTitle.innerHTML = film['original_title'];
+
+    const filmDescription = document.createElement("div");
+    filmDescription.setAttribute("class", "film-card__overview");
+    filmDescription.innerHTML = film['overview'];
+
+    const filmStats = document.createElement("div");
+    filmStats.setAttribute("class", "film-card__stats");
+    filmStats.innerHTML = `Vote average: ${film['vote_average']} Vote count: ${film['vote_count']}`;
+
+    filmCard.appendChild(title);
+    filmCard.appendChild(filmTitle);
+    filmCard.appendChild(filmDescription);
+    filmCard.appendChild(filmStats);
+
+    filmCard.style.display = 'flex';
 }
 
 async function autocomplete() {
@@ -73,8 +107,8 @@ async function autocomplete() {
             if (!resp.ok) return;
             const data = await resp.json();
 
-            const itemsApi = data.results.slice(0, itemsCount).map(i => i['original_title'].trim().toLowerCase());
-            items = [...itemsApi, ...itemsLocal];
+            const itemsApi = data.results.slice(0, itemsCount);
+            items = [...itemsLocal, ...itemsApi];
         } catch (err) {
             console.log(err);
             return;
@@ -86,14 +120,17 @@ async function autocomplete() {
         inp.parentNode.appendChild(suggestsList);
 
         for (const item of items) {
+            const suggestContent = item['original_title'].trim().toLowerCase();
             const suggest = document.createElement("div");
             suggest.setAttribute("class", "suggests__item");
-            suggest.innerHTML = `<strong>${item}</strong>`;
-            suggest.innerHTML += `<input type='hidden' value='${item}'>`;
+            suggest.innerHTML = `<strong>${suggestContent}</strong>`;
+            suggest.innerHTML += `<input type='hidden' value='${suggestContent}'>`;
 
             suggest.addEventListener("click", function(e) {
                 inp.value = this.getElementsByTagName("input")[0].value;
+                inp['active'] = item;
                 closeSuggests();
+                showFilmCard(item);
             });
             suggestsList.appendChild(suggest);
         }

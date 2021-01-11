@@ -1,5 +1,14 @@
 body {
     font: 16px Arial;
+    width: 100%;
+    height: 100%;
+    position: fixed;
+    top: 0;
+    left: 0;
+    display: flex;
+    align-items: center;
+    align-content: center;
+    justify-content: center;
 }
 
 .autocomplete {
@@ -71,4 +80,13 @@ body {
 
 .last-searches__item:last-child {
     border-bottom: 0;
+}
+
+.film-card {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    width: 300px;
+    height: 300px;
 }
